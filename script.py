@@ -68,16 +68,15 @@ def get_subject(name_subject, year_of_study):
 
 
 def get_commendation(date, schoolkid, subject, teacher):
-    commendation = Commendation.objects.filter(
+    commendations = Commendation.objects.filter(
         created=date,
         schoolkid=schoolkid,
         subject=subject,
         teacher=teacher
     )
-    if commendation.exists():
-        return commendation.first()
-    else:
-        return None
+    if commendations.exists():
+        return commendations.first()
+    return None
 
 
 def fix_marks(name_schoolkid=''):
@@ -94,9 +93,9 @@ def remove_chastisements(name_schoolkid=''):
     schoolkid = get_schoolkid(name_schoolkid)
     if schoolkid:
         chastisements = Chastisement.objects.filter(schoolkid=schoolkid)
-        count_of_updated = chastisements.delete()[0]
-        if count_of_updated:
-            print(f'Удалено {count_of_updated} замечаний')
+        count_of_deleted, _ = chastisements.delete()
+        if count_of_deleted:
+            print(f'Удалено {count_of_deleted} замечаний')
         print("Замечания отсутствуют")
 
 
@@ -109,7 +108,7 @@ def create_commendation(name_schoolkid='', name_subject=''):
             subject=subject,
             group_letter=schoolkid.group_letter
         )
-        if lessons[0]:
+        if lessons.exists():
             lesson_newest = lessons.order_by('-date').first()
             if get_commendation(
                     date=lesson_newest.date,
