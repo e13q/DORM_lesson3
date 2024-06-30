@@ -101,29 +101,30 @@ def remove_chastisements(name_schoolkid=''):
 
 def create_commendation(name_schoolkid='', name_subject=''):
     schoolkid = get_schoolkid(name_schoolkid)
-    subject = schoolkid and get_subject(name_subject, schoolkid.year_of_study)
-    if subject:
-        lessons = Lesson.objects.filter(
-            year_of_study__contains=schoolkid.year_of_study,
-            subject=subject,
-            group_letter=schoolkid.group_letter
-        )
-        if lessons.exists():
-            lesson_newest = lessons.order_by('-date').first()
-            if get_commendation(
-                    date=lesson_newest.date,
-                    schoolkid=schoolkid,
-                    subject=subject,
-                    teacher=lesson_newest.teacher
-            ) is None:
-                commendation = Commendation.objects.create(
-                    text=random.choice(COMMENDATIONS),
-                    created=lesson_newest.date,
-                    schoolkid=schoolkid,
-                    subject=subject,
-                    teacher=lesson_newest.teacher
-                )
-                print(f'Создана похвала за {commendation.created}')
-            else:
-                print(f'За последний урок {subject.title} уже похвали')
+    if schoolkid:
+        subject = get_subject(name_subject, schoolkid.year_of_study)
+        if subject:
+            lessons = Lesson.objects.filter(
+                year_of_study__contains=schoolkid.year_of_study,
+                subject=subject,
+                group_letter=schoolkid.group_letter
+            )
+            if lessons.exists():
+                lesson_newest = lessons.order_by('-date').first()
+                if get_commendation(
+                        date=lesson_newest.date,
+                        schoolkid=schoolkid,
+                        subject=subject,
+                        teacher=lesson_newest.teacher
+                ) is None:
+                    commendation = Commendation.objects.create(
+                        text=random.choice(COMMENDATIONS),
+                        created=lesson_newest.date,
+                        schoolkid=schoolkid,
+                        subject=subject,
+                        teacher=lesson_newest.teacher
+                    )
+                    print(f'Создана похвала за {commendation.created}')
+                else:
+                    print(f'За последний урок {subject.title} уже похвалили')
 
